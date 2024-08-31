@@ -1,17 +1,17 @@
 import books from "../models/Book.js";
 
 class BookController {
-  static listMany = async (req, res) => {
+  static listMany = async (req, res, next) => {
     try {
       const success = await books.find().populate("author").exec();
 
       res.status(200).json(success);
     } catch (error) {
-      res.status(500).json({ message: "Erro interno no servidor" });
+      next(error);
     }
   };
 
-  static getOne = async (req, res) => {
+  static getOne = async (req, res, next) => {
     try {
       const id = req.params.id;
 
@@ -22,13 +22,11 @@ class BookController {
 
       res.status(200).send(success);
     } catch (error) {
-      res
-        .status(400)
-        .send({ message: `${error.message} - Id do livro não localizado.` });
+        next(error);
     }
   };
 
-  static create = async (req, res) => {
+  static create = async (req, res, next) => {
     try {
       let book = new books(req.body);
 
@@ -36,13 +34,11 @@ class BookController {
 
       res.status(201).send(success.toJSON());
     } catch (error) {
-      res
-        .status(500)
-        .send({ message: `${error.message} - falha ao cadastrar livro.` });
+      next(error);
     }
   };
 
-  static update = async (req, res) => {
+  static update = async (req, res, next) => {
     try {
       const id = req.params.id;
 
@@ -50,11 +46,11 @@ class BookController {
 
       res.status(200).send({ message: "Livro atualizado com sucesso" });
     } catch (error) {
-      res.status(500).send({ message: error.message });
+      next(error);
     }
   };
 
-  static delete = async (req, res) => {
+  static delete = async (req, res, next) => {
     try {
       const id = req.params.id;
 
@@ -62,11 +58,11 @@ class BookController {
 
       res.status(200).send({ message: "Livro removido com sucesso" });
     } catch (error) {
-      res.status(500).send({ message: error.message });
+      next(error);
     }
   };
 
-  static listByPublisher = async (req, res) => {
+  static listByPublisher = async (req, res, next) => {
     try {
       const publisher = req.query.publisher;
 
@@ -74,7 +70,7 @@ class BookController {
 
       res.status(200).send(success);
     } catch (error) {
-      res.status(500).json({ message: "Erro interno no servidor" });
+      next(error);
     }
   };
 }

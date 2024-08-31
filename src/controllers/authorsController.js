@@ -1,31 +1,32 @@
 import authors from "../models/Author.js";
 
 class AuthorController {
-  static listMany = async (req, res) => {
+  static listMany = async (req, res, next) => {
     try {
       const success = await authors.find();
 
       res.status(200).json(success);
     } catch (error) {
-      res.status(500).json({ message: "Erro interno no servidor" });
+      next(error);
     }
   };
 
-  static getOne = async (req, res) => {
+  static getOne = async (req, res, next) => {
     try {
       const id = req.params.id;
 
       const success = await authors.findById(id);
 
-      res.status(200).send(success);
+      if (success !== null)
+        res.status(200).send(success);
+      else
+        res.status(404).send({ message: "Id do Autor não localizado." });
     } catch (error) {
-      res
-        .status(400)
-        .send({ message: `${error.message} - Id do Autor não localizado.` });
+      next(error);
     }
   };
 
-  static create = async (req, res) => {
+  static create = async (req, res, next) => {
     try {
       let author = new authors(req.body);
 
@@ -33,13 +34,11 @@ class AuthorController {
 
       res.status(201).send(success.toJSON());
     } catch (error) {
-      res
-        .status(500)
-        .send({ message: `${error.message} - falha ao cadastrar Autor.` });
+      next(error);
     }
   };
 
-  static update = async (req, res) => {
+  static update = async (req, res, next) => {
     try {
       const id = req.params.id;
 
@@ -47,11 +46,11 @@ class AuthorController {
 
       res.status(200).send({ message: "Autor atualizado com sucesso" });
     } catch (erro) {
-      res.status(500).send({ message: erro.message });
+      next(error);
     }
   };
 
-  static delete = async (req, res) => {
+  static delete = async (req, res, next) => {
     try {
       const id = req.params.id;
 
@@ -59,7 +58,7 @@ class AuthorController {
 
       res.status(200).send({ message: "Autor removido com sucesso" });
     } catch (erro) {
-      res.status(500).send({ message: erro.message });
+      next(error);
     }
   };
 }
