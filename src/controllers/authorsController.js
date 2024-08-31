@@ -1,3 +1,4 @@
+import NotFound from "../errors/NotFound.js";
 import authors from "../models/Author.js";
 
 class AuthorController {
@@ -20,7 +21,7 @@ class AuthorController {
       if (success !== null)
         res.status(200).send(success);
       else
-        res.status(404).send({ message: "Id do Autor não localizado." });
+        next(new NotFound("Id do autor não localizado."));
     } catch (error) {
       next(error);
     }
@@ -42,9 +43,12 @@ class AuthorController {
     try {
       const id = req.params.id;
 
-      await authors.findByIdAndUpdate(id, { $set: req.body });
+      const success = await authors.findByIdAndUpdate(id, { $set: req.body });
 
-      res.status(200).send({ message: "Autor atualizado com sucesso" });
+      if (success !== null)
+        res.status(200).send({ message: "Autor atualizado com sucesso" });
+      else
+        next(new NotFound("Erro ao atualizar! Id do autor não localizado."))
     } catch (erro) {
       next(error);
     }
@@ -54,9 +58,12 @@ class AuthorController {
     try {
       const id = req.params.id;
 
-      await authors.findByIdAndDelete(id);
+      const success = await authors.findByIdAndDelete(id);
 
-      res.status(200).send({ message: "Autor removido com sucesso" });
+      if (success !== null)
+        res.status(200).send({ message: "Autor removido com sucesso" });
+      else
+        next(new NotFound("Erro ao deletar! Id do autor não localizado."))
     } catch (erro) {
       next(error);
     }
