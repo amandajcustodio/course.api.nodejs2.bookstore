@@ -4,9 +4,11 @@ import { authors, books } from "../models/module.js";
 class BookController {
   static listMany = async (req, res, next) => {
     try {
-      const success = await books.find().populate("author").exec();
-
-      res.status(200).json(success);
+      const findAll = books.find();
+        // .populate("author"); // é usado assim quando não temos o plugin autopopulate ativado
+        
+      req.result = findAll;
+      next();
     } catch (error) {
       next(error);
     }
@@ -17,9 +19,7 @@ class BookController {
       const id = req.params.id;
 
       const success = await books
-        .findById(id)
-        .populate("author", "name")
-        .exec();
+        .findById(id);
 
       if (success !== null) res.status(200).send(success);
       else next(new NotFound("Id do livro não localizado."));
@@ -74,9 +74,10 @@ class BookController {
 
       if (!search) return res.status(200).send([]);
 
-      const success = await books
-      .find(search)
-      .populate("author");
+      const filteredList = books // se atentar a sempre remover o await quando for adicionar a paginação
+      .find(search);
+
+      req.result = filteredList;
 
       // Buscar pelos dois (obrigatóriamente)
       // const success = await books.find({
@@ -84,7 +85,7 @@ class BookController {
       //   title: title,
       // });
 
-      res.status(200).send(success);
+      next();
     } catch (error) {
       next(error);
     }
