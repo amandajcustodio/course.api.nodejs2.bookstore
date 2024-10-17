@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import autopopulate from "mongoose-autopopulate";
 
 const bookSchema = new mongoose.Schema({
   id: { type: String },
@@ -33,6 +34,7 @@ const bookSchema = new mongoose.Schema({
   },
 });
 
+bookSchema.plugin(autopopulate); // ativa o plugin autopopulate para todas as rotas de listagem
 const books = mongoose.model("books", bookSchema);
 
 export default books;

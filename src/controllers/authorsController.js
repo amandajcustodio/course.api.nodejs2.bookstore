@@ -4,9 +4,10 @@ import { authors } from "../models/module.js";
 class AuthorController {
   static listMany = async (req, res, next) => {
     try {
-      const success = await authors.find();
+      const findAll = authors.find();
 
-      res.status(200).json(success);
+      req.result = findAll;
+      next();
     } catch (error) {
       next(error);
     }
@@ -68,6 +69,32 @@ class AuthorController {
       next(error);
     }
   };
+
+  static listByFilter = async (req, res, next) => {
+    try {
+      const search = getSearchFilters(req.query);
+
+      if (!search) return res.status(200).send([]);
+
+      const filteredList = authors.find(search);
+
+      req.result = filteredList;
+      next();
+    } catch (error) {
+      next(error);
+    }
+  }
+}
+
+function getSearchFilters(params) {
+  const { name, nationality } = params;
+
+  let search = {};
+
+  if (name) search.name = { $regex: name, $options: "i" };
+  if (nationality) search.nationality = { $regex: nationality, $options: "i" };
+
+  return search;
 }
 
 export default AuthorController;
